@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -31,13 +32,14 @@ public class OrderController {
 		
 	}
 	@GetMapping("/retrieve/{id}")
-	public OrderEntity retrieveCustomerOrder(@PathVariable int id) {
+	public ResponseEntity<OrderEntity> retrieveCustomerOrder(@PathVariable int id) {
+			Optional<OrderEntity> orderEntity=repository.findById((long) id);
+			
 		
-		Optional<OrderEntity> orderEntity=repository.findById((long) id);
-		if(orderEntity.isPresent()) {
-			return orderEntity.get();
+		if(!orderEntity.isPresent()) {
+			throw new OrderNotFoundException("id -"+id);
 		}else {
-			return new OrderEntity();
+			return new ResponseEntity<OrderEntity>(orderEntity.get(), HttpStatus.OK);
 		}
 		
 	}
